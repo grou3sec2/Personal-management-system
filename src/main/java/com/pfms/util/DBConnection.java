@@ -11,7 +11,7 @@ public class DBConnection {
     // Update 'personal_finance_db' with your actual MySQL database name
     private static final String URL = "jdbc:mysql://localhost:3306/personal_finance_db?useSSL=false&allowPublicKeyRetrieval=true";
     private static final String USER = "root";
-    private static final String PASSWORD = "1234"; 
+    private static final String PASSWORD = "1234"; // use your local database and password
 
     public static Connection getConnection() {
         Connection conn = null;
