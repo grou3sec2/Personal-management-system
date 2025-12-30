@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Personal-Finance-Management-System
 A Java-based personal finance management system built with Java Servlets and MySQL, enabling users to manage income and expenses, track spending categories, and view financial summaries securely.
 
@@ -30,3 +31,7 @@ Project Structure
 ## 🔑 Database Setup
 - Import the `database.sql` file (found in /db folder).
 - Update your local credentials in `com.pfms.util.DBConnection`.
+=======
+# Personal-management-system
+A Java-based web application designed to help users manage their personal finances efficiently
+>>>>>>> 49e50f98085ad65b008ab0dcafd5ba29e49f115c
