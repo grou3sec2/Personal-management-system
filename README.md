@@ -30,7 +30,7 @@ Project Structure
 
 ## 🔑 Database Setup
 - Import the `database.sql` file (found in /db folder).
-- Update your local credentials in `com.pfms.util.DBConnection`.
+- Update your local credentials in `com.pfms.util.DBConnection` with your actual username and password.
 =======
 # Personal-management-system
 A Java-based web application designed to help users manage their personal finances efficiently
