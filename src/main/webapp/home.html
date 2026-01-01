@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PFMS | Capital Intelligence</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:wght@100..700" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --bg-deep: #020617;
+            --card-bg: #0f172a;
+            --border-color: #1e293b;
+            --text-main: #f8fafc;
+            --text-dim: #94a3b8;
+            --primary: #6366f1;
+            --emerald: #10b981;
+            --rose: #f43f5e;
+            --nav-glass: rgba(2, 6, 23, 0.8);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            min-height: 100vh;
+            line-height: 1.5;
+        }
+
+        /* Layout Containers */
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+
+        /* Navigation */
+        nav {
+            position: sticky; top: 0; z-index: 50;
+            background: var(--nav-glass);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-color);
+            height: 80px;
+        }
+        .nav-content {
+            display: flex; justify-content: space-between; align-items: center; height: 100%;
+        }
+        .nav-brand { display: flex; align-items: center; gap: 16px; }
+        .logo-box {
+            width: 40px; height: 40px; background: var(--primary);
+            border-radius: 12px; display: flex; align-items: center; justify-content: center;
+        }
+        .nav-user { font-size: 14px; font-weight: 500; color: var(--emerald); }
+        .btn-logout {
+            background: rgba(30, 41, 59, 0.5); border: 1px solid var(--border-color);
+            color: var(--text-main); padding: 8px 16px; border-radius: 12px;
+            font-size: 12px; font-weight: 700; cursor: pointer; transition: 0.3s;
+        }
+        .btn-logout:hover { background: rgba(244, 63, 94, 0.1); color: var(--rose); }
+
+        /* Summary Cards Grid */
+        .summary-section { padding-top: 48px; padding-bottom: 24px; }
+        .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; }
+        
+        .bento-card {
+            background: var(--card-bg); border: 1px solid var(--border-color);
+            border-radius: 24px; padding: 24px; transition: 0.3s;
+        }
+        .card-label { font-size: 10px; font-weight: 900; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; }
+        .card-value { font-size: 28px; font-weight: 800; margin-top: 4px; }
+        
+        .border-emerald { border-left: 4px solid var(--emerald); }
+        .border-rose { border-left: 4px solid var(--rose); }
+        .bg-indigo-soft { background: rgba(99, 102, 241, 0.05); border-color: rgba(99, 102, 241, 0.2); }
+
+        /* Actions Area */
+        .actions-bar { padding: 16px 0; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 24px; }
+        .btn-group { display: flex; gap: 16px; flex: 1; justify-content: flex-end; }
+        .btn {
+            padding: 16px 32px; border-radius: 16px; font-weight: 700; cursor: pointer;
+            border: none; display: flex; align-items: center; gap: 8px; color: white; transition: 0.3s;
+        }
+        .btn-inc { background: var(--emerald); box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.2); }
+        .btn-exp { background: var(--primary); box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.2); }
+        .btn:active { transform: scale(0.98); }
+
+        /* Main Dashboard Row */
+        .dashboard-row { display: grid; grid-template-columns: 2fr 1fr; gap: 24px; margin-bottom: 24px; }
+        @media (max-width: 1024px) { .dashboard-row { grid-template-columns: 1fr; } }
+
+        .chart-container { height: 300px; }
+
+        /* Health Section */
+        .health-content { display: flex; flex-direction: column; justify-content: space-between; height: 100%; }
+        .health-score { font-size: 60px; font-weight: 800; line-height: 1; margin: 8px 0; }
+        .health-status { font-size: 12px; font-weight: 700; color: var(--emerald); text-transform: uppercase; }
+        .progress-track { width: 100%; height: 12px; background: var(--bg-deep); border-radius: 100px; border: 1px solid var(--border-color); overflow: hidden; margin-top: 24px; }
+        .health-bar { height: 100%; background: linear-gradient(to right, var(--rose), #f59e0b, var(--emerald)); width: 0%; transition: width 1.2s ease-in-out; }
+
+        /* Ledger History */
+        .ledger-card { border-radius: 32px; overflow: hidden; margin-bottom: 80px; }
+        .ledger-header { padding: 32px 40px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .ledger-list { list-style: none; }
+        .ledger-item {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 24px 40px; border-bottom: 1px solid var(--border-color); transition: 0.2s;
+        }
+        .ledger-item:hover { background: rgba(30, 41, 59, 0.2); }
+        .item-info { display: flex; align-items: center; gap: 20px; }
+        .icon-box {
+            width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center;
+        }
+        .icon-box.inc { background: rgba(16, 185, 129, 0.1); color: var(--emerald); }
+        .icon-box.exp { background: rgba(244, 63, 94, 0.1); color: var(--rose); }
+        
+        .item-desc { font-weight: 700; }
+        .item-date { font-size: 10px; color: var(--text-dim); text-transform: uppercase; font-weight: 800; }
+        
+        .item-actions { display: flex; align-items: center; gap: 32px; }
+        .item-amount { font-size: 18px; font-weight: 900; }
+        .btn-delete { color: #334155; border: none; background: none; cursor: pointer; opacity: 0; transition: 0.3s; }
+        .ledger-item:hover .btn-delete { opacity: 1; color: var(--rose); }
+
+        /* Modals */
+        #modalOverlay {
+            position: fixed; inset: 0; z-index: 60; background: rgba(2, 6, 23, 0.9);
+            backdrop-filter: blur(8px); display: none; justify-content: center; align-items: center; padding: 24px;
+        }
+        .modal-box { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 40px; padding: 40px; width: 100%; max-width: 400px; display: none; }
+        .modal-title { font-size: 24px; font-weight: 800; margin-bottom: 24px; }
+        .input-field {
+            width: 100%; background: var(--bg-deep); border: 1px solid var(--border-color);
+            padding: 16px; border-radius: 16px; color: white; margin-bottom: 16px; outline: none;
+        }
+        .input-field:focus { border-color: var(--primary); }
+        .modal-footer { display: flex; gap: 16px; margin-top: 16px; }
+        .btn-cancel { background: none; border: none; color: var(--text-dim); font-weight: 700; cursor: pointer; flex: 1; }
+        .btn-confirm { flex: 2; padding: 16px; border-radius: 16px; border: none; font-weight: 700; cursor: pointer; color: white; }
+
+        /* Delete Specific Modal */
+        .delete-icon {
+            width: 64px; height: 64px; background: rgba(244, 63, 94, 0.1); color: var(--rose);
+            border-radius: 20px; display: flex; align-items: center; justify-content: center; margin: 0 auto 24px;
+        }
+        .delete-text { color: var(--text-dim); font-size: 14px; margin-bottom: 32px; text-align: center; }
+        .btn-danger { background: var(--rose); width: 100%; padding: 16px; border-radius: 16px; border: none; color: white; font-weight: 700; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+<nav>
+    <div class="container nav-content">
+        <div class="nav-brand">
+            <div class="logo-box"><span class="material-symbols-rounded">account_balance_wallet</span></div>
+            <span style="font-size: 20px; font-weight: 800;">PFMS</span>
+            <div style="width: 1px; height: 24px; background: var(--border-color); margin: 0 8px;"></div>
+            <span id="navUserFullName" class="nav-user">Syncing...</span>
+        </div>
+        <button onclick="logout()" class="btn-logout">Logout</button>
+    </div>
+</nav>
+
+<div class="container summary-section">
+    <div class="grid-3">
+        <div class="bento-card border-emerald">
+            <p class="card-label">Inflow</p>
+            <h3 id="incomeAmount" class="card-value">0 ETB</h3>
+        </div>
+        <div class="bento-card border-rose">
+            <p class="card-label">Outflow</p>
+            <h3 id="expenseAmount" class="card-value">0 ETB</h3>
+        </div>
+        <div class="bento-card bg-indigo-soft">
+            <p class="card-label" style="color: var(--primary);">Net Balance</p>
+            <h3 id="balanceAmount" class="card-value">0 ETB</h3>
+        </div>
+    </div>
+</div>
+
+<div class="container actions-bar">
+    <h1 style="font-size: 28px; font-weight: 900; letter-spacing: -0.5px;">Vault Intelligence</h1>
+    <div class="btn-group">
+        <button onclick="openModal('incomeModal')" class="btn btn-inc"><span class="material-symbols-rounded">add</span> Income</button>
+        <button onclick="openModal('expenseModal')" class="btn btn-exp"><span class="material-symbols-rounded">remove</span> Expense</button>
+    </div>
+</div>
+
+<main class="container">
+    <div class="dashboard-row">
+        <div class="bento-card" style="padding: 32px;">
+            <p class="card-label" style="color: var(--primary); margin-bottom: 24px;">Capital Flow Trend</p>
+            <div class="chart-container"><canvas id="trendChart"></canvas></div>
+        </div>
+        <div class="bento-card">
+            <div class="health-content">
+                <div>
+                    <p class="card-label">Vitality Score</p>
+                    <h3 id="healthPercent" class="health-score">0%</h3>
+                    <p id="healthStatus" class="health-status">Checking Liquidity...</p>
+                </div>
+                <div class="progress-track">
+                    <div id="healthBar" class="health-bar"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="bento-card ledger-card">
+        <div class="ledger-header">
+            <h2 style="font-weight: 800;">Ledger History</h2>
+            <span class="item-date">Live Sync Active</span>
+        </div>
+        <ul id="transactionList" class="ledger-list"></ul>
+        <div id="emptyState" style="padding: 100px 0; text-align: center; color: var(--text-dim); display: none;">Vault is currently empty.</div>
+    </div>
+</main>
+
+<div id="modalOverlay">
+    <div id="incomeModal" class="modal-box">
+        <h3 class="modal-title" style="color: var(--emerald);">Add Funds</h3>
+        <input type="number" id="incomeInput" placeholder="0.00 ETB" class="input-field">
+        <input type="text" id="incomeDesc" placeholder="Source of income" class="input-field">
+        <div class="modal-footer">
+            <button onclick="closeModal()" class="btn-cancel">Cancel</button>
+            <button onclick="handleSubmit('INCOME')" class="btn-confirm" style="background: var(--emerald);">Deposit</button>
+        </div>
+    </div>
+
+    <div id="expenseModal" class="modal-box">
+        <h3 class="modal-title" style="color: var(--primary);">Record Expense</h3>
+        <input type="number" id="expenseInput" placeholder="0.00 ETB" class="input-field">
+        <input type="text" id="expenseDesc" placeholder="What was this for?" class="input-field">
+        <div class="modal-footer">
+            <button onclick="closeModal()" class="btn-cancel">Cancel</button>
+            <button onclick="handleSubmit('EXPENSE')" class="btn-confirm" style="background: var(--primary);">Commit</button>
+        </div>
+    </div>
+
+    <div id="deleteModal" class="modal-box" style="text-align: center;">
+        <div class="delete-icon"><span class="material-symbols-rounded" style="font-size: 32px;">delete_forever</span></div>
+        <h3 class="modal-title" style="margin-bottom: 8px;">Delete Entry?</h3>
+        <p class="delete-text">This action will permanently remove this record from the vault ledger.</p>
+        <button id="confirmDeleteBtn" class="btn-danger">Yes, Delete Permanently</button>
+        <button onclick="closeModal()" class="btn-cancel" style="margin-top: 16px; width: 100%;">Go Back</button>
+    </div>
+</div>
+
+<script>
+    let trendChart, deleteIdPending = null;
+
+    function initCharts() {
+        const ctx = document.getElementById('trendChart').getContext('2d');
+        trendChart = new Chart(ctx, {
+            type: 'line',
+            data: { labels: [], datasets: [{ 
+                data: [], borderColor: '#6366f1', backgroundColor: 'rgba(99, 102, 241, 0.05)', 
+                fill: true, tension: 0.4, pointRadius: 4, pointBackgroundColor: '#6366f1', borderWidth: 3 
+            }]},
+            options: { 
+                responsive: true, maintainAspectRatio: false, 
+                scales: { 
+                    y: { grid: { color: '#1e293b' }, ticks: { color: '#475569' } },
+                    x: { grid: { display: false }, ticks: { color: '#475569' } }
+                },
+                plugins: { legend: { display: false } }
+            }
+        });
+    }
+
+    async function loadData() {
+        try {
+            const res = await fetch('api/transactions');
+            if (!res.ok) { window.location.replace('index.html'); return; }
+            const data = await res.json();
+            document.getElementById('navUserFullName').textContent = data.user.full_name || "Authorized User";
+            updateDashboard(data.transactions || []);
+        } catch (e) { console.error(e); }
+    }
+
+    function updateDashboard(transactions) {
+        let inc = 0, exp = 0;
+        const trendData = [];
+        const trendLabels = [];
+        
+        const chrono = [...transactions].sort((a, b) => new Date(a.transactionDate) - new Date(b.transactionDate));
+        let runningBalance = 0;
+        
+        chrono.forEach(t => {
+            const val = parseFloat(t.amount);
+            if (t.transactionType === 'INCOME') runningBalance += val;
+            else runningBalance -= val;
+            trendData.push(runningBalance);
+            trendLabels.push(t.transactionDate.split(' ')[0]);
+        });
+
+        transactions.forEach(t => {
+            const val = parseFloat(t.amount);
+            if (t.transactionType === 'INCOME') inc += val; else exp += val;
+        });
+
+        document.getElementById('incomeAmount').textContent = `${inc.toLocaleString()} ETB`;
+        document.getElementById('expenseAmount').textContent = `${exp.toLocaleString()} ETB`;
+        document.getElementById('balanceAmount').textContent = `${(inc - exp).toLocaleString()} ETB`;
+
+        const score = inc > 0 ? Math.max(0, Math.min(100, ((inc - exp) / inc) * 100)) : 0;
+        document.getElementById('healthPercent').textContent = Math.round(score) + "%";
+        document.getElementById('healthBar').style.width = score + "%";
+        document.getElementById('healthStatus').textContent = score > 40 ? "Healthy Liquidity" : "Low Reserve";
+        
+        trendChart.data.labels = trendLabels;
+        trendChart.data.datasets[0].data = trendData;
+        trendChart.update();
+
+        renderList(transactions);
+    }
+
+    function renderList(transactions) {
+        const list = document.getElementById('transactionList');
+        const empty = document.getElementById('emptyState');
+        list.innerHTML = '';
+        
+        if (transactions.length === 0) { empty.style.display = 'block'; return; }
+        empty.style.display = 'none';
+
+        transactions.forEach(t => {
+            const isInc = t.transactionType === 'INCOME';
+            const li = document.createElement('li');
+            li.className = "ledger-item";
+            li.innerHTML = `
+                <div class="item-info">
+                    <div class="icon-box ${isInc ? 'inc' : 'exp'}">
+                        <span class="material-symbols-rounded">${isInc ? 'north_east' : 'south_west'}</span>
+                    </div>
+                    <div>
+                        <p class="item-desc">${t.description}</p>
+                        <p class="item-date">${t.transactionDate}</p>
+                    </div>
+                </div>
+                <div class="item-actions">
+                    <p class="item-amount" style="color: ${isInc ? 'var(--emerald)' : 'white'}">
+                        ${isInc ? '+' : '-'}${parseFloat(t.amount).toLocaleString()}
+                    </p>
+                    <button onclick="triggerDelete(${t.id})" class="btn-delete">
+                        <span class="material-symbols-rounded">delete</span>
+                    </button>
+                </div>
+            `;
+            list.appendChild(li);
+        });
+    }
+
+    async function handleSubmit(type) {
+        const pfx = type.toLowerCase();
+        const amount = document.getElementById(`${pfx}Input`).value;
+        const description = document.getElementById(`${pfx}Desc`).value;
+        if (!amount || !description) return;
+
+        const res = await fetch('api/transactions', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ amount, description, transactionType: type })
+        });
+        if (res.ok) { 
+            closeModal(); 
+            loadData(); 
+            document.getElementById(`${pfx}Input`).value = ''; 
+            document.getElementById(`${pfx}Desc`).value = ''; 
+        }
+    }
+
+    function triggerDelete(id) {
+        deleteIdPending = id;
+        openModal('deleteModal');
+    }
+
+    document.getElementById('confirmDeleteBtn').addEventListener('click', async () => {
+        if (deleteIdPending) {
+            await fetch(`api/transactions/${deleteIdPending}`, { method: 'DELETE' });
+            deleteIdPending = null;
+            closeModal();
+            loadData();
+        }
+    });
+
+    function openModal(id) {
+        document.getElementById('modalOverlay').style.display = 'flex';
+        document.getElementById(id).style.display = 'block';
+    }
+
+    function closeModal() {
+        document.getElementById('modalOverlay').style.display = 'none';
+        const boxes = document.querySelectorAll('.modal-box');
+        boxes.forEach(box => box.style.display = 'none');
+    }
+
+    function logout() { window.location.href = 'logout'; }
+    window.addEventListener('DOMContentLoaded', () => { initCharts(); loadData(); });
+</script>
+</body>
+</html>
