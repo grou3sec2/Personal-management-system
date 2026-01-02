@@ -14,6 +14,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+// defining servlet api's
+
+
+// api transactions
 @WebServlet("/api/transactions/*")
 public class TransactionServlet extends HttpServlet {
 
@@ -110,4 +114,5 @@ public class TransactionServlet extends HttpServlet {
             resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
     }
+
 }
